@@ -1,31 +1,27 @@
+#pragma once
 #include "Globals.h"
 
+// TH_Controller — управляет нагревателем и увлажнителем через RelayManager.
+// Читает температуру и влажность из SensorManager.
+// Целевые значения берёт из Data.
+
 class TH_Controller {
-  private:
-    unsigned char t_Pin;
-    unsigned char h_Pin;
+private:
+  uint8_t relayTempId; // ID нагревателя в RelayManager
+  uint8_t relayHumId;  // ID увлажнителя в RelayManager
 
-  public:
-    TH_Controller(unsigned char t_Pin_, unsigned char h_Pin_) {
-      t_Pin = t_Pin_;
-      h_Pin = h_Pin_;
-      pinMode(t_Pin, OUTPUT);
-      pinMode(h_Pin, OUTPUT);
-    }
+public:
+  TH_Controller(uint8_t relayTempId_, uint8_t relayHumId_)
+    : relayTempId(relayTempId_), relayHumId(relayHumId_) {}
 
-    void loop() {
-      // Включаем нагреватель если текущая температура НИЖЕ заданной
-      if (t < data.getSave_temperature()) {
-        digitalWrite(t_Pin, RELAY_ON_LEVEL);
-      } else {
-        digitalWrite(t_Pin, RELAY_OFF_LEVEL);
-      }
+  void loop() {
+    float t = sensorManager.getValue(SENSOR_ID_TEMP);
+    float h = sensorManager.getValue(SENSOR_ID_HUM);
 
-      // Включаем увлажнитель если текущая влажность НИЖЕ заданной почви
-      if (h < data.getSave_humidity()) {
-        digitalWrite(h_Pin, RELAY_ON_LEVEL);
-      } else {
-        digitalWrite(h_Pin, RELAY_OFF_LEVEL);
-      }
-    }
+    // Включаем нагреватель если температура НИЖЕ заданной
+    relayManager.set(relayTempId, t < data.getSave_temperature());
+
+    // Включаем увлажнитель если влажность НИЖЕ заданной
+    relayManager.set(relayHumId,  h < data.getSave_humidity());
+  }
 };
