@@ -76,11 +76,14 @@ class ButtonControl {
 
       if (kursor.isPressed()) {
         menuModule.kursor = menuModule.kursor + 1 ;
-        if(menuModule.kursor >= 3){ menuModule.kursor = 0; }
+        if(menuModule.kursor >= 6){ menuModule.kursor = 0; }
       }
     }
 
     void menu_2() {
-      // зарезервировано
+      if (kursor.isPressed()) {
+        menuModule.kursor = menuModule.kursor + 1 ;
+        if(menuModule.kursor >= 6){ menuModule.kursor = 0; }
+      }
     }
 };
