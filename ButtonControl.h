@@ -47,6 +47,7 @@ class ButtonControl {
       if (plus.isPressed(false) || minus.isPressed(false)) {
         pinLight.setPinClick();
         data.setInkubatorLight(pinLight.getPinStatus());
+        Serial.println(data.getInkubatorLight());
       }
     }
 

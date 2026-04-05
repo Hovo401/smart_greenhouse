@@ -3,14 +3,14 @@
 #include <Arduino.h>
 
 #include "Config.h"
-#include "Data.h"
+
 #include "Timer.h"
 
 #include <DHT22.h>
 #include <RTClib.h>
 
 // ---- Глобальные объекты проекта ----
-extern Data data;
+
 extern Timer timer;
 
 extern DHT22 dht22;
@@ -40,8 +40,8 @@ inline void initRelays() {
     RELAY_4_WINDOW1, RELAY_5_WINDOW2, RELAY_6_SPARE1,
     RELAY_7_SPARE2, RELAY_8_SPARE3
   };
-  for (int i = 0; i < 8; i++) {
-    pinMode(RELAY_PINS[i], OUTPUT);
-    digitalWrite(RELAY_PINS[i], RELAY_OFF_LEVEL);
-  }
+  // for (int i = 0; i < 8; i++) {
+  //   pinMode(RELAY_PINS[i], OUTPUT);
+  //   digitalWrite(RELAY_PINS[i], RELAY_OFF_LEVEL);
+  // }
 }

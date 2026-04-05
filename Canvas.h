@@ -117,7 +117,7 @@ class Canvas {
 
         lcd.setCursor(0, 2);
         lcd.print("sensor: ");
-        lcd.print(sensor_1_Value_HUM);
+        lcd.print(sensor_1_Value_HUM);lcd.print("   ");
 
         lcd.setCursor(1, 3);
         lcd.print("w-time");
@@ -160,7 +160,7 @@ class Canvas {
 
         lcd.setCursor(0, 2);
         lcd.print("sensor: ");
-        lcd.print(sensor_1_Value_HUM);
+        lcd.print(sensor_1_Value_HUM);lcd.print("   ");
 
         lcd.setCursor(1, 3);
         lcd.print("w-time");

@@ -11,14 +11,13 @@ class Inkubator_MiniApp {
     TH_Controller th_Controller;
 
     Inkubator_MiniApp() :
-      pin_Light_3(RELAY_3_LIGHT, data.getInkubatorLight()),
+      pin_Light_3(RELAY_3_LIGHT, data.getInkubatorLight()), // ✅ теперь data.begin() уже вызван
       menuModule(pin_Light_3),
       buttonControl(menuModule, pin_Light_3),
       th_Controller(RELAY_1_HEATER, RELAY_2_HUMIDIFIER)
     {}
 
     void setup() {
-      data.begin();
       menuModule.setup();
     }
 
