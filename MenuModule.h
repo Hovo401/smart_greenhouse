@@ -8,7 +8,7 @@ class MenuModule {
 
   public:
     static bool fliker;
-    unsigned char kursor = 2;
+    unsigned char kursor = 0;
 
     MenuModule(Pin& pinLight_):
       canvas(&MenuModule::fliker, &kursor, pinLight_)
@@ -21,11 +21,12 @@ class MenuModule {
     // ---- set ----
     bool setMenu(int num) {
       if (0 <= num && num <= canvas.max_menu) {
-        if (num == 1) {
-          kursor = 2;
-        } else if (num == 2) {
-          kursor = 1;
-        }
+        // if (num == 1) {
+        //   kursor = 2;
+        // } else if (num == 2) {
+        //   kursor = 1;
+        // }
+        kursor = 0;
         menu = num;
         return true;
       }

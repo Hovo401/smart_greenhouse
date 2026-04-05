@@ -93,112 +93,88 @@ class Canvas {
     }
 
     void menu_1(){
-        lcd.setCursor(9, 0);
-        lcd.print("  ");
-        lcd.setCursor(0, 1);
-        lcd.print(" ");
-
 
         lcd.setCursor(0, 0);
         lcd.print("watering");
-        if(*kursor == 0){
-          lcd.setCursor(9, 0);
-          lcd.print("->");
-          lcd.setCursor(9, 0);
-
-        }
-        
         lcd.setCursor(11, 0);
+        if(*kursor == 0 && *flicker)lcd.print(">"); else lcd.print(" ");
+        
+        lcd.setCursor(12, 0);
         lcd.print("Auto:");
         lcd.print("onn");
 
+        lcd.setCursor(0, 1);
+        if(*kursor == 1 && *flicker)lcd.print(">"); else lcd.print(" ");
         lcd.setCursor(1, 1);
         lcd.print("val:");
         lcd.print( 1234 );
+
+        lcd.setCursor(9, 1);
+        if(*kursor == 2 && *flicker)lcd.print(">"); else lcd.print(" ");
         lcd.setCursor(10, 1);
         lcd.print( "minute:" );
         lcd.print( 300 );
 
         lcd.setCursor(0, 2);
-        lcd.print("real-time hum: ");
-        lcd.print(sensor_1_Value_HUM);
+        lcd.print("sensor: ");
+        lcd.print(sensor_1_Value_HUM);lcd.print("   ");
 
         lcd.setCursor(1, 3);
-        lcd.print("w-time ");
-        lcd.print("22:15");
+        lcd.print("w-time");
+        lcd.setCursor(7, 3);
+        if(*kursor == 3 && *flicker)lcd.print(">"); else lcd.print(" ");
+        lcd.setCursor(8, 3);
+        lcd.print(22);
+        if(*kursor == 4 && *flicker)lcd.print(">"); else lcd.print(":");
+        lcd.print(15);
+
+        lcd.setCursor(13, 3);
+        if(*kursor == 5 && *flicker)lcd.print(">"); else lcd.print(" ");
         lcd.setCursor(14, 3);
         lcd.print("rele:1");
+
         
-
-        if(*kursor == 1){
-          lcd.setCursor(0, 1);
-          lcd.print(">");
-          lcd.setCursor(9, 0);
-          lcd.print("  ");
-          lcd.setCursor(5, 2);
-          lcd.print("  ");
-        }
-
-        if(*kursor == 2){
-          lcd.setCursor(5, 2);
-          lcd.print("->");
-        }
-        // lcd.setCursor(2, 2);
-        // lcd.print("Save Temp. = ");lcd.print(data.getSave_temperature(), 1);
-        // lcd.setCursor(2, 3);
-        // lcd.print("Save hum . = ");lcd.print(data.getSave_humidity(), 1);
-        // if(*kursor == 2){
-        //   lcd.setCursor(0, 3);
-        //   lcd.print("  ");
-        //   lcd.setCursor(0, 2);
-        //   lcd.print("->");
-        // }else if(*kursor == 3){
-        //   lcd.setCursor(0, 2);
-        //   lcd.print("  ");
-        //   lcd.setCursor(0, 3);
-        //   lcd.print("->");
-        // }
     }
 
     void menu_2(){
-      lcd.setCursor(0, 0);
-      lcd.print("Hum. "); 
-      
-      lcd.print("Hum. ");
-      // lcd.setCursor(0, 0); sensor_1_Value_HUM
-      // lcd.print("   timer controll");
-      // lcd.setCursor(2, 1);
-      // lcd.print("Enabled: ");
-      // if(pin_timer.timer_on_){
-      //   lcd.print("on ");
-      // }else{
-      //   lcd.print("off");
-      // }
-      // lcd.setCursor(2, 2);
-      // lcd.print( Timer::getDateString( pin_timer.time_pin_off));
-      // if(*kursor == 1){
-      //     lcd.setCursor(0, 2);
-      //     lcd.print("  ");
-      //     lcd.setCursor(0, 1);
-      //     lcd.print("->");
-      // }else if(*kursor == 2){
-      //     lcd.setCursor(0, 1);
-      //     lcd.print("  ");
-      //     lcd.setCursor(0, 2);
-      //     lcd.print("->");
-      // }
+        lcd.setCursor(0, 0);
+        lcd.print("temperature");
+        lcd.setCursor(11, 0);
+        if(*kursor == 0 && *flicker)lcd.print(">"); else lcd.print(" ");
+        
+        lcd.setCursor(12, 0);
+        lcd.print("Auto:");
+        lcd.print("onn");
 
-      // lcd.setCursor(0, 3); 
-      // if(pin_timer.getTime_pin_off_real()  > 0){
-      //   lcd.print("  timer =  ");
-      // }
-      // else if(*flicker){
-      //   lcd.print("  rotating");
-      // }else{
-      //   lcd.print("          ");
-      // }
-      // lcd.setCursor(11, 3); 
-      // lcd.print( Timer::getDateString(pin_timer.getTime_pin_off_real() ));
+        lcd.setCursor(0, 1);
+        if(*kursor == 1 && *flicker)lcd.print(">"); else lcd.print(" ");
+        lcd.setCursor(1, 1);
+        lcd.print("val:");
+        lcd.print( 1234 );
+
+        lcd.setCursor(9, 1);
+        if(*kursor == 2 && *flicker)lcd.print(">"); else lcd.print(" ");
+        lcd.setCursor(10, 1);
+        lcd.print( "minute:" );
+        lcd.print( 300 );
+
+        lcd.setCursor(0, 2);
+        lcd.print("sensor: ");
+        lcd.print(sensor_1_Value_HUM);lcd.print("   ");
+
+        lcd.setCursor(1, 3);
+        lcd.print("w-time");
+        lcd.setCursor(7, 3);
+        if(*kursor == 3 && *flicker)lcd.print(">"); else lcd.print(" ");
+        lcd.setCursor(8, 3);
+        lcd.print(22);
+        if(*kursor == 4 && *flicker)lcd.print(">"); else lcd.print(":");
+        lcd.print(15);
+
+        lcd.setCursor(13, 3);
+        if(*kursor == 5 && *flicker)lcd.print(">"); else lcd.print(" ");
+        lcd.setCursor(14, 3);
+        lcd.print("rele:1");
     }
     void menu_3(){
 

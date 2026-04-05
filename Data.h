@@ -1,147 +1,122 @@
-#include <EEPROM.h>
 
-// ----------------------------- Структура для хранения данных -----------------------------
+#include <Arduino.h>
+#include <Preferences.h>
+
+// ----------------------------- Структуры данных -----------------------------
 struct ClimateControlData {
-  float save_temperature;
-  float save_humidity;
+    float save_temperature = 37.7f;
+    float save_humidity    = 60.0f;
 };
 
 struct PinTimerRotationData {
-  unsigned long time_pin_on;
-  unsigned long time_pin_off;
-  bool timer_on_;
+    unsigned long time_pin_on  = 3000;
+    unsigned long time_pin_off = 3600000;
+    bool          timer_on_    = false;
 };
+
 struct SettingsData {
-  bool inkubatorLight;
+    bool inkubatorLight = true;
 };
 
-// --- ---
 struct Data_ {
-  ClimateControlData climateControlData;
-  PinTimerRotationData pinTimerRotationData;
-  SettingsData settingsData;
+    ClimateControlData   climateControlData;
+    PinTimerRotationData pinTimerRotationData;
+    SettingsData         settingsData;
 };
-// ========================================================================================
 
+// ----------------------------- Класс управления -----------------------------
 class Data {
 private:
-  int address = 0; 
-  Data_ data_;
-  bool started_ = false;
-  void addDefault() {
-    data_.climateControlData.save_temperature = 37.7;
-    data_.climateControlData.save_humidity = 60;
-    data_.pinTimerRotationData.time_pin_on = 3000;
-    data_.pinTimerRotationData.time_pin_off = 3600000;
-    data_.pinTimerRotationData.timer_on_ = false;
-    data_.settingsData.inkubatorLight = true;
+    Preferences  prefs;
+    Data_        data_;
+    const char*  NS = "app_st";
 
-    // Также обновляем данные в EEPROM, чтобы они отражали обнуленные значения
-    EEPROM.put(address, data_);
-    EEPROM.commit();
-  }
+    void saveAll() {
+        prefs.begin(NS, false);
+        prefs.putFloat("temp",     data_.climateControlData.save_temperature);
+        prefs.putFloat("hum",      data_.climateControlData.save_humidity);
+        prefs.putULong("t_on",     data_.pinTimerRotationData.time_pin_on);
+        prefs.putULong("t_off",    data_.pinTimerRotationData.time_pin_off);
+        prefs.putBool ("timer_on", data_.pinTimerRotationData.timer_on_);
+        prefs.putBool ("light",    data_.settingsData.inkubatorLight);
+        prefs.end();
+    }
+
 public:
-  Data(){
-    // On ESP32 EEPROM must be started in setup() via begin().
-    // Keep safe defaults until begin() is called.
-    data_.climateControlData.save_temperature = 37.7;
-    data_.climateControlData.save_humidity = 60;
-    data_.pinTimerRotationData.time_pin_on = 3000;
-    data_.pinTimerRotationData.time_pin_off = 3600000;
-    data_.pinTimerRotationData.timer_on_ = false;
-    data_.settingsData.inkubatorLight = true;
-  }
+    Data() {} // пустой — читаем только в begin()
 
-  void begin() {
-    if (started_) return;
-    started_ = true;
-    EEPROM.begin(sizeof(Data_));
-    EEPROM.get(address, data_);
-    if (
-      data_.climateControlData.save_temperature != data_.climateControlData.save_temperature || 
-      data_.climateControlData.save_humidity != data_.climateControlData.save_humidity ||
-      data_.pinTimerRotationData.time_pin_on != data_.pinTimerRotationData.time_pin_on || 
-      data_.pinTimerRotationData.time_pin_off != data_.pinTimerRotationData.time_pin_off || 
-      data_.pinTimerRotationData.timer_on_ != data_.pinTimerRotationData.timer_on_ ||
-      data_.settingsData.inkubatorLight != data_.settingsData.inkubatorLight
-    ) {
-      addDefault();
+    // Вызывать ПЕРВЫМ в setup(), до всего остального
+    void begin() {
+        prefs.begin(NS, false);
+        if (!prefs.isKey("temp")) {
+            // Первый запуск — записываем дефолты
+            prefs.end();
+            saveAll();
+        } else {
+            // Загружаем сохранённые данные
+            data_.climateControlData.save_temperature  = prefs.getFloat("temp",     37.7f);
+            data_.climateControlData.save_humidity     = prefs.getFloat("hum",      60.0f);
+            data_.pinTimerRotationData.time_pin_on     = prefs.getULong("t_on",     3000);
+            data_.pinTimerRotationData.time_pin_off    = prefs.getULong("t_off",    3600000);
+            data_.pinTimerRotationData.timer_on_       = prefs.getBool ("timer_on", false);
+            data_.settingsData.inkubatorLight          = prefs.getBool ("light",    true);
+            prefs.end();
+        }
     }
-  }
-  // -------------------------------------------------------- set --------------------------------------------------------
-  void setSave_temperature(float temperature) {
-    if( 30.0 <= temperature && temperature <= 41.0 ){
-      data_.climateControlData.save_temperature = temperature;
-      // Сохраняем новое значение в EEPROM
-      EEPROM.put(address, data_); // Указываем адрес EEPROM, где хотим сохранить структуру данных
-      EEPROM.commit();
-    }
-  }
-  void setSave_humidity(float humidity) {
-    if( 40 <= humidity && humidity <= 95 ){
-      data_.climateControlData.save_humidity = humidity;
-      // Сохраняем новое значение в EEPROM
-      EEPROM.put(address, data_); // Указываем адрес EEPROM для сохранения второй структуры данных
-      EEPROM.commit();
-    }
-  }
 
-  // -------- pinTimerRotationData ------- 
-  void setPinTime_pin_on(unsigned long time_pin_on){
-    if( 1800000 <= time_pin_on && time_pin_on <= 86400000 ){
-      data_.pinTimerRotationData.time_pin_on = time_pin_on;
-      // Сохраняем новое значение в EEPROM
-      EEPROM.put(address, data_); // Указываем адрес EEPROM для сохранения третьей структуры данных
-      EEPROM.commit();
+    // ---------------------------- Сеттеры ----------------------------
+
+    void setSave_temperature(float val) {
+        if (val < 30.0f || val > 41.0f) return;
+        data_.climateControlData.save_temperature = val;
+        prefs.begin(NS, false);
+        prefs.putFloat("temp", val);
+        prefs.end();
     }
-  }
-  void setPinTime_pin_off(unsigned long time_pin_off){
-    if( 1800000 <= time_pin_off && time_pin_off <= 86400000 ){
-      data_.pinTimerRotationData.time_pin_off = time_pin_off;
-      // Сохраняем новое значение в EEPROM
-      EEPROM.put(address, data_); // Указываем адрес EEPROM для сохранения третьей структуры данных
-      EEPROM.commit();
+
+    void setSave_humidity(float val) {
+        if (val < 40.0f || val > 95.0f) return;
+        data_.climateControlData.save_humidity = val;
+        prefs.begin(NS, false);
+        prefs.putFloat("hum", val);
+        prefs.end();
     }
-  }
-  void setPinTimer_on_(bool timer_on_){
-    data_.pinTimerRotationData.timer_on_ = timer_on_;
-    // Сохраняем новое значение в EEPROM
-    EEPROM.put(address, data_); // Указываем адрес EEPROM для сохранения третьей структуры данных
-    EEPROM.commit();
-  }
 
-  // ------------- Settings -------------
-  void setInkubatorLight(bool light){
-    if(light != data_.settingsData.inkubatorLight){
-      data_.settingsData.inkubatorLight = light;
-      EEPROM.put(address, data_); // Указываем адрес EEPROM для сохранения третьей структуры данных
-      EEPROM.commit();
+    void setPinTime_pin_on(unsigned long val) {
+        if (val < 1800000 || val > 86400000) return;
+        data_.pinTimerRotationData.time_pin_on = val;
+        prefs.begin(NS, false);
+        prefs.putULong("t_on", val);
+        prefs.end();
     }
-  }
-  // ==================================================================================================================
 
-  // -------------------------------- get --------------------------------------
-  float getSave_temperature() {
-    return data_.climateControlData.save_temperature;
-  }
-  float getSave_humidity() {
-    return data_.climateControlData.save_humidity;
-  }
+    void setPinTime_pin_off(unsigned long val) {
+        if (val < 1800000 || val > 86400000) return;
+        data_.pinTimerRotationData.time_pin_off = val;
+        prefs.begin(NS, false);
+        prefs.putULong("t_off", val);
+        prefs.end();
+    }
 
-  // pinTimerRotationData
-  unsigned long getPinTime_pin_on(){
-    return data_.pinTimerRotationData.time_pin_on;
-  }
-  unsigned long getPinTime_pin_off(){
-    return data_.pinTimerRotationData.time_pin_off;
-  }
-  bool getPinTimer_on_(){
-    return data_.pinTimerRotationData.timer_on_;
-  }
+    void setPinTimer_on_(bool val) {
+        data_.pinTimerRotationData.timer_on_ = val;
+        prefs.begin(NS, false);
+        prefs.putBool("timer_on", val);
+        prefs.end();
+    }
 
-  // ------------- Settings -------------
-  bool getInkubatorLight(){
-    return data_.settingsData.inkubatorLight;
-  }
-  // ===========================================================================
+    void setInkubatorLight(bool val) {
+        data_.settingsData.inkubatorLight = val;
+        prefs.begin(NS, false);
+        prefs.putBool("light", val);
+        prefs.end();
+    }
+
+    // ---------------------------- Геттеры ----------------------------
+    float         getSave_temperature()  const { return data_.climateControlData.save_temperature; }
+    float         getSave_humidity()     const { return data_.climateControlData.save_humidity; }
+    unsigned long getPinTime_pin_on()    const { return data_.pinTimerRotationData.time_pin_on; }
+    unsigned long getPinTime_pin_off()   const { return data_.pinTimerRotationData.time_pin_off; }
+    bool          getPinTimer_on_()      const { return data_.pinTimerRotationData.timer_on_; }
+    bool          getInkubatorLight()    const { return data_.settingsData.inkubatorLight; }
 };

@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-Data data;
+
 Timer timer;
 
 DHT22 dht22(PIN_DHT22);
