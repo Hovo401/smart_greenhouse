@@ -1,20 +1,19 @@
+#pragma once
 #include "Globals.h"
 #include "Inkubator_MiniApp.h"
 
-class App{
-  private:
-    Inkubator_MiniApp Inkubator_MiniApp;
-  public:
-    App(){}
+class App {
+private:
+  Inkubator_MiniApp inkubatorApp;
 
-    void setup() {
-      // timer.setInterval([](){
-      //     Serial.println( String(t) + "|" + String(h) );
-      //     Serial.println( "mi casa su casa" );
-      // }, 1000, 3 );
-      Inkubator_MiniApp.setup();
-    }
-    void loop() {
-      Inkubator_MiniApp.loop();
-    }
+public:
+  App() {}
+
+  void setup() {
+    inkubatorApp.setup();
+  }
+
+  void loop() {
+    inkubatorApp.loop();
+  }
 };
